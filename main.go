@@ -109,6 +109,13 @@ func main() {
 			Usage:   "scp file list",
 			EnvVars: []string{"PLUGIN_SOURCE", "SCP_SOURCE", "SOURCE", "INPUT_SOURCE"},
 		},
+
+		&cli.StringSliceFlag{
+			Name:    "ignore",
+			Usage:   "scp file ignorelist",
+			EnvVars: []string{"PLUGIN_IGNORE", "SCP_IGNORE", "INGORE", "INPUT_IGNORE_SOURCE"},
+		},
+
 		&cli.BoolFlag{
 			Name:    "rm, r",
 			Usage:   "remove target folder before upload data",
@@ -319,6 +326,7 @@ func run(c *cli.Context) error {
 			KeyPath:           c.String("key-path"),
 			Target:            c.StringSlice("target"),
 			Source:            c.StringSlice("source"),
+			Ignore:            c.StringSlice("ignore"),
 			Remove:            c.Bool("rm"),
 			Debug:             c.Bool("debug"),
 			StripComponents:   c.Int("strip.components"),

@@ -57,6 +57,7 @@ type (
 		CommandTimeout    time.Duration
 		Target            []string
 		Source            []string
+		Ignore            []string
 		Remove            bool
 		StripComponents   int
 		TarExec           string
@@ -103,7 +104,7 @@ func trimPath(keys []string) []string {
 
 func globList(paths []string) fileList {
 	var list fileList
-
+	fmt.Printf("--path %v", paths)
 	for _, pattern := range paths {
 		ignore := false
 		pattern = strings.Trim(pattern, " ")
@@ -135,10 +136,11 @@ func buildArgs(tar string, files fileList) []string {
 			args = append(args, v)
 		}
 	}
+
+	fmt.Printf("--tar args %v", files.Ignore)
 	args = append(args, "-cf")
 	args = append(args, getRealPath(tar))
 	args = append(args, files.Source...)
-
 	return args
 }
 
@@ -252,6 +254,9 @@ func (p *Plugin) Exec() error {
 	if len(p.Config.Source) == 0 || len(p.Config.Target) == 0 {
 		return errMissingSourceOrTarget
 	}
+
+
+	fmt.Printf("--source %v", p.Config.Ignore)
 
 	files := globList(trimPath(p.Config.Source))
 	p.DestFile = fmt.Sprintf("%s.tar", random.String(10))
