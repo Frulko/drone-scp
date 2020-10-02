@@ -110,10 +110,10 @@ func main() {
 			EnvVars: []string{"PLUGIN_SOURCE", "SCP_SOURCE", "SOURCE", "INPUT_SOURCE"},
 		},
 
-		&cli.StringSliceFlag{
+		&cli.StringFlag{
 			Name:    "ignore",
 			Usage:   "scp file ignorelist",
-			EnvVars: []string{"PLUGIN_IGNORE", "SCP_IGNORE", "INGORE", "INPUT_IGNORE_SOURCE"},
+			EnvVars: []string{"PLUGIN_IGNORE", "SCP_IGNORE", "IGNORE", "INPUT_IGNORE_SOURCE"},
 		},
 
 		&cli.BoolFlag{
@@ -326,7 +326,7 @@ func run(c *cli.Context) error {
 			KeyPath:           c.String("key-path"),
 			Target:            c.StringSlice("target"),
 			Source:            c.StringSlice("source"),
-			Ignore:            c.StringSlice("ignore"),
+			Ignore:            c.String("ignore"),
 			Remove:            c.Bool("rm"),
 			Debug:             c.Bool("debug"),
 			StripComponents:   c.Int("strip.components"),

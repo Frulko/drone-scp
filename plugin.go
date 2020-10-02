@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -57,7 +60,7 @@ type (
 		CommandTimeout    time.Duration
 		Target            []string
 		Source            []string
-		Ignore            []string
+		Ignore        		string
 		Remove            bool
 		StripComponents   int
 		TarExec           string
@@ -102,9 +105,58 @@ func trimPath(keys []string) []string {
 	return newKeys
 }
 
+func loadIgnoreFile(ignoreFile string, list fileList) fileList {
+	// TODO: detect if ignoreFile exist
+	// TODO: Load it
+	// TODO: Read line by line
+	// TODO: append to list.Ignore
+
+	
+
+	// fmt.Println("readFileWithReadString")
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("--error or", ignoreFile)
+		return list
+	}
+
+	ignoreFullPath := path.Join(dir, ignoreFile)
+	file, err := os.Open(ignoreFullPath)
+	if err != nil {
+		fmt.Println("--error load", ignoreFullPath)
+		return list
+	}
+	defer file.Close()
+
+	// Start reading from the file with a reader.
+	reader := bufio.NewReader(file)
+	var line string
+	for {
+			line, err = reader.ReadString('\n')
+			if err != nil && err != io.EOF {
+					break
+			}
+
+			// Process the line here.
+			ignorePath := strings.Trim(line, " ")
+			list.Ignore = append(list.Ignore, ignorePath)
+			if err != nil {
+					break
+			}
+	}
+
+	if err != io.EOF {
+			fmt.Println(" > Failed with error: %v\n", err)
+			return list
+	}
+
+	return list
+}
+
 func globList(paths []string) fileList {
 	var list fileList
 	fmt.Printf("--path %v", paths)
+	fmt.Println("-- --")
 	for _, pattern := range paths {
 		ignore := false
 		pattern = strings.Trim(pattern, " ")
@@ -255,10 +307,11 @@ func (p *Plugin) Exec() error {
 		return errMissingSourceOrTarget
 	}
 
-
-	fmt.Printf("--source %v", p.Config.Ignore)
+	
+	fmt.Println("--ignore %v", p.Config.Ignore)
 
 	files := globList(trimPath(p.Config.Source))
+	files = loadIgnoreFile(p.Config.Ignore, files)
 	p.DestFile = fmt.Sprintf("%s.tar", random.String(10))
 
 	// create a temporary file for the archive
